@@ -48,6 +48,10 @@ export default class SeedList extends React.Component {
     e.preventDefault();
   }
 
+  componentDidMount() {
+    this.refs.add.focus();
+  }
+
   render() {
     const simpleList = this.state.items.map((val, key) => (
       <Item key={key} val={val} parent={this} />
