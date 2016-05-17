@@ -1,5 +1,13 @@
 import React from 'react';
 
+class GroupMember extends React.Component {
+  render() {
+    return (
+        (<li>{this.props.val}</li>)
+    )
+  }
+}
+
 export default class Groups extends React.Component {
   constructor() {
     super()
@@ -21,7 +29,7 @@ export default class Groups extends React.Component {
     }
     this.state.items.map((val, key) => {
       groups[key % groups.length].push(
-        (<li key={key}>{val}</li>)
+        (<GroupMember key={key} val={val} />)
       )
     });
 
