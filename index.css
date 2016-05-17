@@ -1,0 +1,28 @@
+.block-list {
+    padding: 20px 0;
+    max-width: 300px;
+    background-color: #fff;
+    border: 1px solid #eee;
+
+    list-style-position: inside;
+    list-style-type: decimal;
+}
+.block-list > * {
+    padding: 10px 40px;
+}
+.block-list > *:first-child {
+    border-top: 1px solid #eee;
+}
+.block-list > * {
+    border-bottom: 1px solid #eee;
+}
+.block-list > *:hover {
+    cursor: move;
+}
+
+.name {
+}
+
+.delete-btn {
+    margin-left: 20px;
+}
