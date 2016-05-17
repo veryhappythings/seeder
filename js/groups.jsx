@@ -4,7 +4,7 @@ export default class Groups extends React.Component {
   constructor() {
     super()
     this.state = {
-      items: ["Dave", "Tom"],
+      items: ["Dave", "Tom", "Ben", "Egg"],
       groups: 2
     };
   }
@@ -27,9 +27,12 @@ export default class Groups extends React.Component {
 
     var seeds = groups.map((group, key) => {
       return (
-        <ol key={key}>
-        {group}
-        </ol>
+        <div key={key}>
+          <p>{key + 1}</p>
+          <ol>
+          {group}
+          </ol>
+          </div>
       )
     })
     return (

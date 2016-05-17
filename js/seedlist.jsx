@@ -22,7 +22,7 @@ export default class SeedList extends React.Component {
   constructor() {
     super();
     this.state = {
-      items: ["Dave", "Tom"]
+      items: ["Dave", "Tom", "Ben", "Egg"]
     };
   }
 
@@ -43,10 +43,16 @@ export default class SeedList extends React.Component {
     this.props.app.update();
   }
 
+  ignoreSubmit(e) {
+    this.refs.add.value = "";
+    e.preventDefault();
+  }
+
   render() {
     const simpleList = this.state.items.map((val, key) => (
       <Item key={key} val={val} parent={this} />
     ));
+
 
     return (
       <div>
@@ -60,12 +66,12 @@ export default class SeedList extends React.Component {
           {simpleList}
         </Sortable>
 
-        <div>
+        <form onSubmit={this.ignoreSubmit.bind(this)}>
           <input id="add-input" ref="add"/>
-          <button type="button" className="btn" onClick={this.add.bind(this)}>
+          <button type="submit" className="btn" onClick={this.add.bind(this)}>
             Add
           </button>
-        </div>
+        </form>
       </div>
     );
   }

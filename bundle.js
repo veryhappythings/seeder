@@ -60,6 +60,18 @@
 	
 	var _reactSortablejs2 = _interopRequireDefault(_reactSortablejs);
 	
+	var _reactAddonsUpdate = __webpack_require__(170);
+	
+	var _reactAddonsUpdate2 = _interopRequireDefault(_reactAddonsUpdate);
+	
+	var _seedlist = __webpack_require__(172);
+	
+	var _seedlist2 = _interopRequireDefault(_seedlist);
+	
+	var _groups = __webpack_require__(173);
+	
+	var _groups2 = _interopRequireDefault(_groups);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -68,7 +80,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	__webpack_require__(170);
+	__webpack_require__(174);
 	
 	var App = function (_React$Component) {
 	  _inherits(App, _React$Component);
@@ -76,51 +88,30 @@
 	  function App() {
 	    _classCallCheck(this, App);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this));
-	
-	    _this.state = {
-	      items: [1, 2, 3, 4, 5]
-	    };
-	    return _this;
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(App).apply(this, arguments));
 	  }
 	
 	  _createClass(App, [{
+	    key: 'update',
+	    value: function update() {
+	      this.refs.groups.setState({
+	        items: this.refs.seedlist.state.items
+	      });
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this2 = this;
-	
-	      var simpleList = this.state.items.map(function (val, key) {
-	        return _react2.default.createElement(
-	          'li',
-	          { key: key, 'data-id': val },
-	          'List Item ',
-	          val
-	        );
-	      });
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        _react2.default.createElement(
-	          _reactSortablejs2.default,
-	          {
-	            className: 'block-list',
-	            ref: function ref(c) {
-	              if (c) {
-	                _this2.simpleList = c.sortable;
-	              }
-	            },
-	            tag: 'ul'
-	          },
-	          simpleList
-	        )
+	        _react2.default.createElement(_seedlist2.default, { ref: 'seedlist', app: this }),
+	        _react2.default.createElement(_groups2.default, { ref: 'groups', app: this })
 	      );
 	    }
 	  }]);
 	
 	  return App;
 	}(_react2.default.Component);
-	
-	;
 	
 	_reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('container'));
 
@@ -21613,13 +21604,401 @@
 /* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = __webpack_require__(171);
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-present, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule update
+	 */
+	
+	/* global hasOwnProperty:true */
+	
+	'use strict';
+	
+	var _assign = __webpack_require__(4);
+	
+	var keyOf = __webpack_require__(26);
+	var invariant = __webpack_require__(7);
+	var hasOwnProperty = {}.hasOwnProperty;
+	
+	function shallowCopy(x) {
+	  if (Array.isArray(x)) {
+	    return x.concat();
+	  } else if (x && typeof x === 'object') {
+	    return _assign(new x.constructor(), x);
+	  } else {
+	    return x;
+	  }
+	}
+	
+	var COMMAND_PUSH = keyOf({ $push: null });
+	var COMMAND_UNSHIFT = keyOf({ $unshift: null });
+	var COMMAND_SPLICE = keyOf({ $splice: null });
+	var COMMAND_SET = keyOf({ $set: null });
+	var COMMAND_MERGE = keyOf({ $merge: null });
+	var COMMAND_APPLY = keyOf({ $apply: null });
+	
+	var ALL_COMMANDS_LIST = [COMMAND_PUSH, COMMAND_UNSHIFT, COMMAND_SPLICE, COMMAND_SET, COMMAND_MERGE, COMMAND_APPLY];
+	
+	var ALL_COMMANDS_SET = {};
+	
+	ALL_COMMANDS_LIST.forEach(function (command) {
+	  ALL_COMMANDS_SET[command] = true;
+	});
+	
+	function invariantArrayCase(value, spec, command) {
+	  !Array.isArray(value) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected target of %s to be an array; got %s.', command, value) : invariant(false) : void 0;
+	  var specValue = spec[command];
+	  !Array.isArray(specValue) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array; got %s. ' + 'Did you forget to wrap your parameter in an array?', command, specValue) : invariant(false) : void 0;
+	}
+	
+	function update(value, spec) {
+	  !(typeof spec === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): You provided a key path to update() that did not contain one ' + 'of %s. Did you forget to include {%s: ...}?', ALL_COMMANDS_LIST.join(', '), COMMAND_SET) : invariant(false) : void 0;
+	
+	  if (hasOwnProperty.call(spec, COMMAND_SET)) {
+	    !(Object.keys(spec).length === 1) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Cannot have more than one key in an object with %s', COMMAND_SET) : invariant(false) : void 0;
+	
+	    return spec[COMMAND_SET];
+	  }
+	
+	  var nextValue = shallowCopy(value);
+	
+	  if (hasOwnProperty.call(spec, COMMAND_MERGE)) {
+	    var mergeObj = spec[COMMAND_MERGE];
+	    !(mergeObj && typeof mergeObj === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): %s expects a spec of type \'object\'; got %s', COMMAND_MERGE, mergeObj) : invariant(false) : void 0;
+	    !(nextValue && typeof nextValue === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): %s expects a target of type \'object\'; got %s', COMMAND_MERGE, nextValue) : invariant(false) : void 0;
+	    _assign(nextValue, spec[COMMAND_MERGE]);
+	  }
+	
+	  if (hasOwnProperty.call(spec, COMMAND_PUSH)) {
+	    invariantArrayCase(value, spec, COMMAND_PUSH);
+	    spec[COMMAND_PUSH].forEach(function (item) {
+	      nextValue.push(item);
+	    });
+	  }
+	
+	  if (hasOwnProperty.call(spec, COMMAND_UNSHIFT)) {
+	    invariantArrayCase(value, spec, COMMAND_UNSHIFT);
+	    spec[COMMAND_UNSHIFT].forEach(function (item) {
+	      nextValue.unshift(item);
+	    });
+	  }
+	
+	  if (hasOwnProperty.call(spec, COMMAND_SPLICE)) {
+	    !Array.isArray(value) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Expected %s target to be an array; got %s', COMMAND_SPLICE, value) : invariant(false) : void 0;
+	    !Array.isArray(spec[COMMAND_SPLICE]) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array of arrays; got %s. ' + 'Did you forget to wrap your parameters in an array?', COMMAND_SPLICE, spec[COMMAND_SPLICE]) : invariant(false) : void 0;
+	    spec[COMMAND_SPLICE].forEach(function (args) {
+	      !Array.isArray(args) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array of arrays; got %s. ' + 'Did you forget to wrap your parameters in an array?', COMMAND_SPLICE, spec[COMMAND_SPLICE]) : invariant(false) : void 0;
+	      nextValue.splice.apply(nextValue, args);
+	    });
+	  }
+	
+	  if (hasOwnProperty.call(spec, COMMAND_APPLY)) {
+	    !(typeof spec[COMMAND_APPLY] === 'function') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be a function; got %s.', COMMAND_APPLY, spec[COMMAND_APPLY]) : invariant(false) : void 0;
+	    nextValue = spec[COMMAND_APPLY](nextValue);
+	  }
+	
+	  for (var k in spec) {
+	    if (!(ALL_COMMANDS_SET.hasOwnProperty(k) && ALL_COMMANDS_SET[k])) {
+	      nextValue[k] = update(value[k], spec[k]);
+	    }
+	  }
+	
+	  return nextValue;
+	}
+	
+	module.exports = update;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactSortablejs = __webpack_require__(168);
+	
+	var _reactSortablejs2 = _interopRequireDefault(_reactSortablejs);
+	
+	var _reactAddonsUpdate = __webpack_require__(170);
+	
+	var _reactAddonsUpdate2 = _interopRequireDefault(_reactAddonsUpdate);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Item = function (_React$Component) {
+	  _inherits(Item, _React$Component);
+	
+	  function Item() {
+	    _classCallCheck(this, Item);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Item).apply(this, arguments));
+	  }
+	
+	  _createClass(Item, [{
+	    key: 'remove',
+	    value: function remove() {
+	      this.props.parent.remove(this.props.val);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'li',
+	        { 'data-id': this.props.val },
+	        _react2.default.createElement(
+	          'span',
+	          { className: 'name' },
+	          this.props.val
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { className: 'delete-btn', onClick: this.remove.bind(this) },
+	          'X'
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return Item;
+	}(_react2.default.Component);
+	
+	var SeedList = function (_React$Component2) {
+	  _inherits(SeedList, _React$Component2);
+	
+	  function SeedList() {
+	    _classCallCheck(this, SeedList);
+	
+	    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(SeedList).call(this));
+	
+	    _this2.state = {
+	      items: ["Dave", "Tom", "Ben", "Egg"]
+	    };
+	    return _this2;
+	  }
+	
+	  _createClass(SeedList, [{
+	    key: 'add',
+	    value: function add() {
+	      this.setState({
+	        items: this.state.items.concat(this.refs.add.value)
+	      }, this.updateApp);
+	    }
+	  }, {
+	    key: 'remove',
+	    value: function remove(val) {
+	      var pos = this.state.items.indexOf(val);
+	      this.setState({
+	        items: (0, _reactAddonsUpdate2.default)(this.state.items, { $splice: [[pos, 1]] })
+	      }, this.updateApp);
+	    }
+	  }, {
+	    key: 'updateApp',
+	    value: function updateApp() {
+	      this.props.app.update();
+	    }
+	  }, {
+	    key: 'ignoreSubmit',
+	    value: function ignoreSubmit(e) {
+	      this.refs.add.value = "";
+	      e.preventDefault();
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _this3 = this;
+	
+	      var simpleList = this.state.items.map(function (val, key) {
+	        return _react2.default.createElement(Item, { key: key, val: val, parent: _this3 });
+	      });
+	
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          _reactSortablejs2.default,
+	          {
+	            className: 'block-list',
+	            onChange: function onChange(order, sortable) {
+	              _this3.setState({ items: order }, _this3.updateApp);
+	            },
+	            tag: 'ol'
+	          },
+	          simpleList
+	        ),
+	        _react2.default.createElement(
+	          'form',
+	          { onSubmit: this.ignoreSubmit.bind(this) },
+	          _react2.default.createElement('input', { id: 'add-input', ref: 'add' }),
+	          _react2.default.createElement(
+	            'button',
+	            { type: 'submit', className: 'btn', onClick: this.add.bind(this) },
+	            'Add'
+	          )
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return SeedList;
+	}(_react2.default.Component);
+	
+	exports.default = SeedList;
+	;
+
+/***/ },
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Groups = function (_React$Component) {
+	  _inherits(Groups, _React$Component);
+	
+	  function Groups() {
+	    _classCallCheck(this, Groups);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Groups).call(this));
+	
+	    _this.state = {
+	      items: ["Dave", "Tom", "Ben", "Egg"],
+	      groups: 2
+	    };
+	    return _this;
+	  }
+	
+	  _createClass(Groups, [{
+	    key: "handleChange",
+	    value: function handleChange(event) {
+	      this.setState({ groups: parseInt(event.target.value) });
+	    }
+	  }, {
+	    key: "render",
+	    value: function render() {
+	      var seeds = [];
+	      var groups = [];
+	      for (var i = 0; i < this.state.groups; i++) {
+	        groups.push([]);
+	      }
+	      this.state.items.map(function (val, key) {
+	        groups[key % groups.length].push(_react2.default.createElement(
+	          "li",
+	          { key: key },
+	          val
+	        ));
+	      });
+	
+	      var seeds = groups.map(function (group, key) {
+	        return _react2.default.createElement(
+	          "div",
+	          { key: key },
+	          _react2.default.createElement(
+	            "p",
+	            null,
+	            key + 1
+	          ),
+	          _react2.default.createElement(
+	            "ol",
+	            null,
+	            group
+	          )
+	        );
+	      });
+	      return _react2.default.createElement(
+	        "div",
+	        null,
+	        _react2.default.createElement(
+	          "div",
+	          null,
+	          _react2.default.createElement(
+	            "span",
+	            null,
+	            "Number of groups: "
+	          ),
+	          _react2.default.createElement("input", {
+	            type: "range",
+	            id: "num-groups",
+	            ref: "numgroups",
+	            min: "1",
+	            max: "33",
+	            value: this.state.groups,
+	            onChange: this.handleChange.bind(this)
+	          }),
+	          _react2.default.createElement(
+	            "span",
+	            null,
+	            this.state.groups
+	          )
+	        ),
+	        _react2.default.createElement(
+	          "ol",
+	          null,
+	          seeds
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return Groups;
+	}(_react2.default.Component);
+	
+	exports.default = Groups;
+
+/***/ },
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(171);
+	var content = __webpack_require__(175);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(173)(content, {});
+	var update = __webpack_require__(177)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -21636,21 +22015,21 @@
 	}
 
 /***/ },
-/* 171 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(172)();
+	exports = module.exports = __webpack_require__(176)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "block-list li {\n    border: 1px solid red;\n};\n", ""]);
+	exports.push([module.id, ".block-list {\n    padding: 20px 0;\n    max-width: 300px;\n    background-color: #fff;\n    border: 1px solid #eee;\n\n    list-style-position: inside;\n    list-style-type: decimal;\n}\n.block-list > * {\n    padding: 10px 40px;\n}\n.block-list > *:first-child {\n    border-top: 1px solid #eee;\n}\n.block-list > * {\n    border-bottom: 1px solid #eee;\n}\n.block-list > *:hover {\n    cursor: move;\n}\n\n.name {\n}\n\n.delete-btn {\n    margin-left: 20px;\n}\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 172 */
+/* 176 */
 /***/ function(module, exports) {
 
 	/*
@@ -21706,7 +22085,7 @@
 
 
 /***/ },
-/* 173 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
