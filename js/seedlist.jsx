@@ -56,6 +56,7 @@ export default class SeedList extends React.Component {
     const simpleList = this.state.items.map((val, key) => (
       <Item key={key} val={val} parent={this} />
     ));
+    console.log(simpleList.length);
 
 
     return (

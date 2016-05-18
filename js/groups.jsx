@@ -24,6 +24,7 @@ export default class Groups extends React.Component {
   render() {
     var seeds = [];
     var groups = [];
+
     for (var i = 0; i < this.state.groups; i++) {
       groups.push([]);
     }

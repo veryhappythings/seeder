@@ -21830,6 +21830,11 @@
 	      e.preventDefault();
 	    }
 	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.refs.add.focus();
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var _this3 = this;
@@ -21837,6 +21842,7 @@
 	      var simpleList = this.state.items.map(function (val, key) {
 	        return _react2.default.createElement(Item, { key: key, val: val, parent: _this3 });
 	      });
+	      console.log(simpleList.length);
 	
 	      return _react2.default.createElement(
 	        'div',
@@ -21896,19 +21902,42 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Groups = function (_React$Component) {
-	  _inherits(Groups, _React$Component);
+	var GroupMember = function (_React$Component) {
+	  _inherits(GroupMember, _React$Component);
+	
+	  function GroupMember() {
+	    _classCallCheck(this, GroupMember);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(GroupMember).apply(this, arguments));
+	  }
+	
+	  _createClass(GroupMember, [{
+	    key: "render",
+	    value: function render() {
+	      return _react2.default.createElement(
+	        "li",
+	        null,
+	        this.props.val
+	      );
+	    }
+	  }]);
+	
+	  return GroupMember;
+	}(_react2.default.Component);
+	
+	var Groups = function (_React$Component2) {
+	  _inherits(Groups, _React$Component2);
 	
 	  function Groups() {
 	    _classCallCheck(this, Groups);
 	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Groups).call(this));
+	    var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(Groups).call(this));
 	
-	    _this.state = {
+	    _this2.state = {
 	      items: ["Dave", "Tom", "Ben", "Egg"],
 	      groups: 2
 	    };
-	    return _this;
+	    return _this2;
 	  }
 	
 	  _createClass(Groups, [{
@@ -21921,15 +21950,12 @@
 	    value: function render() {
 	      var seeds = [];
 	      var groups = [];
+	
 	      for (var i = 0; i < this.state.groups; i++) {
 	        groups.push([]);
 	      }
 	      this.state.items.map(function (val, key) {
-	        groups[key % groups.length].push(_react2.default.createElement(
-	          "li",
-	          { key: key },
-	          val
-	        ));
+	        groups[key % groups.length].push(_react2.default.createElement(GroupMember, { key: key, val: val }));
 	      });
 	
 	      var seeds = groups.map(function (group, key) {
@@ -22023,7 +22049,7 @@
 	
 	
 	// module
-	exports.push([module.id, ".block-list {\n    padding: 20px 0;\n    max-width: 300px;\n    background-color: #fff;\n    border: 1px solid #eee;\n\n    list-style-position: inside;\n    list-style-type: decimal;\n}\n.block-list > * {\n    padding: 10px 40px;\n}\n.block-list > *:first-child {\n    border-top: 1px solid #eee;\n}\n.block-list > * {\n    border-bottom: 1px solid #eee;\n}\n.block-list > *:hover {\n    cursor: move;\n}\n\n.name {\n}\n\n.delete-btn {\n    margin-left: 20px;\n}\n", ""]);
+	exports.push([module.id, ".block-list {\n    padding: 0px 0;\n    max-width: 300px;\n    background-color: #fff;\n    border: 1px solid #eee;\n\n    list-style-position: inside;\n    list-style-type: decimal;\n}\n.block-list > * {\n    padding: 10px 40px;\n}\n.block-list > *:first-child {\n    border-top: 1px solid #eee;\n}\n.block-list > * {\n    border-bottom: 1px solid #eee;\n}\n.block-list > *:hover {\n    cursor: move;\n}\n\n.name {\n}\n\n.delete-btn {\n    margin-left: 20px;\n}\n", ""]);
 	
 	// exports
 
